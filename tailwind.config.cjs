@@ -2,7 +2,7 @@
 module.exports = {
   content: [
     './index.html',
-    './src/**/*.{js,ts,jsx,tsx}', // Include all necessary file extensions
+    './src/**/*.{js,ts,jsx,tsx}',
   ],
   darkMode: 'class',
   theme: {
@@ -20,6 +20,9 @@ module.exports = {
       animation: {
         'fade-in': 'fade-in 0.5s ease-in-out forwards',
         'fade-and-scale': 'fade-and-scale 0.5s ease-in-out forwards',
+      },
+      fontFamily: {
+        sans: ['Lato',],
       },
     },
   },

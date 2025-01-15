@@ -60,7 +60,6 @@ const Stocks: React.FC = () => {
   }, [currentPage]);
 
   const handlePushToMarketplace = async (productId: number) => {
-    console.log(localStorage.getItem('token'), "ppp")
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_REACT_APP_API_URL}/api/v1/stocklist/${productId}/push-to-marketplace/`,

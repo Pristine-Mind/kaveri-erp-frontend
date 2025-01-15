@@ -249,7 +249,7 @@ const Home: React.FC = () => {
                 {t('sales_management')}
               </Link>
             </li>
-            <li className="mb-4">
+            {/* <li className="mb-4">
               <Link
                 to="/stats"
                 className="flex items-center px-4 py-2 text-sm font-medium rounded hover:bg-blue-700"
@@ -257,10 +257,10 @@ const Home: React.FC = () => {
                 <ChartSquareBarIcon className="h-5 w-5 mr-3" />
                 {t('stats_and_analytics')}
               </Link>
-            </li>
+            </li> */}
             <li className="mb-4">
               <Link
-                to=""
+                to="/inventory-dashboard"
                 className="flex items-center px-4 py-2 text-sm font-medium rounded hover:bg-blue-700"
               >
                 <ScaleIcon className="h-5 w-5 mr-3" />

@@ -275,6 +275,8 @@ i18n.use(LanguageDetector).use(initReactI18next).init({
         strong_beer: "Strong Beer",
         sub_category: "Sub Category",
         add_product: "Add Product",
+        supplier_name: "Supplier Name",
+        edit_supplier: "Edit Supplier",
       }
         
     },

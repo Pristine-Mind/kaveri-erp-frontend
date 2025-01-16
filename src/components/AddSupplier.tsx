@@ -18,10 +18,10 @@ interface ErrorMessages {
   email?: string[];
   address?: string[];
   registration_number?: string[];
-  general?: string[]; // General errors
+  general?: string[];
 }
 
-const AddProducer: React.FC = () => {
+const AddSupplier: React.FC = () => {
   const { t } = useTranslation();
 
   const [producers, setProducers] = useState<Producer[]>([]);
@@ -37,14 +37,14 @@ const AddProducer: React.FC = () => {
   const [errorMessages, setErrorMessages] = useState<ErrorMessages>({});
   const [success, setSuccess] = useState('');
   const [editingProducerId, setEditingProducerId] = useState<number | null>(null);
-
+  const [countryCode, setCountryCode] = useState('+1');
   const [limit] = useState(10);
   const [offset, setOffset] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
 
   const fetchProducers = async (limit: number, offset: number, searchQuery: string = '') => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v1/producers/`, {
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/api/v1/suppliers/`, {
         params: {
           limit,
           offset,
@@ -84,7 +84,7 @@ const AddProducer: React.FC = () => {
     setOffset(0);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -95,31 +95,37 @@ const AddProducer: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Combine countryCode and contact for submission
+      const submissionData = {
+        ...formData,
+        contact: `${countryCode}-${formData.contact}`,
+      };
+  
       if (editingProducerId) {
         await axios.patch(
-          `${import.meta.env.VITE_REACT_APP_API_URL}/api/v1/producers/${editingProducerId}/`,
-          formData,
-          {
-            headers: {
-              Authorization: `Token ${localStorage.getItem('token')}`,
-            }
-          } 
-        );
-        setSuccess(t('producer_updated_successfully'));
-        setEditingProducerId(null);
-      } else {
-        await axios.post(
-          `${import.meta.env.VITE_REACT_APP_API_URL}/api/v1/producers/`,
-          formData,
+          `${import.meta.env.VITE_REACT_APP_API_URL}/api/v1/suppliers/${editingProducerId}/`,
+          submissionData,
           {
             headers: {
               Authorization: `Token ${localStorage.getItem('token')}`,
             },
           }
         );
-        
+        setSuccess(t('producer_updated_successfully'));
+        setEditingProducerId(null);
+      } else {
+        await axios.post(
+          `${import.meta.env.VITE_REACT_APP_API_URL}/api/v1/suppliers/`,
+          submissionData,
+          {
+            headers: {
+              Authorization: `Token ${localStorage.getItem('token')}`,
+            },
+          }
+        );
         setSuccess(t('producer_added_successfully'));
       }
+  
       setErrorMessages({});
       setFormData({
         name: '',
@@ -128,9 +134,10 @@ const AddProducer: React.FC = () => {
         address: '',
         registration_number: ''
       });
+      setCountryCode('+1');
       setFormVisible(false);
       fetchProducers(limit, offset, searchQuery);
-
+  
       setTimeout(() => {
         setSuccess('');
       }, 1000);
@@ -142,6 +149,7 @@ const AddProducer: React.FC = () => {
       }
     }
   };
+  
 
   const handlePageChange = (newOffset: number) => {
     setOffset(newOffset);
@@ -163,7 +171,7 @@ const AddProducer: React.FC = () => {
 
   const handleExport = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/export/producers/`, {
+      const response = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/export/suppliers/`, {
         responseType: 'blob',
         headers: {
           Authorization: `Token ${localStorage.getItem('token')}`,
@@ -288,7 +296,7 @@ const AddProducer: React.FC = () => {
             </div>
             <div className="relative bg-white rounded-lg shadow-xl p-8 w-full max-w-lg z-20">
               <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6 bg-gray-200 px-4 py-2 rounded-lg">
-                {editingProducerId ? t('edit_farmer') : t('add_farmer')}
+                {editingProducerId ? t('edit_supplier') : t('add_supplier')}
               </h3>
 
               <form onSubmit={handleSubmit}>
@@ -296,7 +304,7 @@ const AddProducer: React.FC = () => {
 
                 <div className="mb-4">
                   <label htmlFor="name" className="block text-gray-700">
-                    {t('producer_name')} <span className="text-red-500">*</span>
+                    {t('supplier_name')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -317,20 +325,42 @@ const AddProducer: React.FC = () => {
                   <label htmlFor="contact" className="block text-gray-700">
                     {t('contact_information')} <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    id="contact"
-                    name="contact"
-                    value={formData.contact}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2 border rounded-lg ${errorMessages.contact ? 'border-red-500' : 'border-gray-300'
+                  <div className="flex">
+                    {/* Country Code Select using local state */}
+                    <select
+                      name="countryCode"
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className={`px-4 py-2 border border-r-0 rounded-l-lg ${
+                        errorMessages.contact ? 'border-red-500' : 'border-gray-300'
                       }`}
-                    required
-                  />
+                      required
+                    >
+                      <option value="+1">+1</option>
+                      <option value="+91">+977</option>
+                    </select>
+
+                    {/* Contact Input */}
+                    <input
+                      type="text"
+                      id="contact"
+                      name="contact"
+                      value={formData.contact}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-2 border border-l-0 rounded-r-lg ${
+                        errorMessages.contact ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      required
+                    />
+                  </div>
+
+                  {/* Error messages */}
                   {errorMessages.contact && (
                     <p className="text-red-500 text-sm">{errorMessages.contact[0]}</p>
                   )}
                 </div>
+
+
 
                 <div className="mb-4">
                   <label htmlFor="email" className="block text-gray-700">
@@ -418,4 +448,4 @@ const AddProducer: React.FC = () => {
   );
 };
 
-export default AddProducer;
+export default AddSupplier;

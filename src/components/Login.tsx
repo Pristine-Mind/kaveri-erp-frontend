@@ -24,16 +24,15 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
-    navigate('/home')
-    // try {
-    //   const response = await axios.post<{ token: string }>(`${import.meta.env.VITE_REACT_APP_API_URL}/login/`, formData);
-    //   const { token } = response.data;
+    try {
+      const response = await axios.post<{ token: string }>(`${import.meta.env.VITE_REACT_APP_API_URL}/login/`, formData);
+      const { token } = response.data;
 
-    //   localStorage.setItem('token', token);
-    //   navigate('/home');
-    // } catch (error) {
-    //   setErrorMessage(t('invalid_credentials'));
-    // }
+      localStorage.setItem('token', token);
+      navigate('/home');
+    } catch (error) {
+      setErrorMessage(t('invalid_credentials'));
+    }
   };
 
   return (

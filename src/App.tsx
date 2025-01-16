@@ -1,16 +1,13 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './components/Login';
 import Home from './components/Home';
-import AddProducer from './components/AddProducer';
+import AddSupplier from './components/AddSupplier';
 import Products from './components/Products';
 import CustomerList from './components/CustomerList';
 import OrderList from './components/Orderlist';
 import SaleList from './components/SalesList';
-import Stocks from './components/Stocks';
-import ProductInstanceView from './components/ProductInstanceView';  
 import StatsDashboard from './components/StatsDashboard';
 import InventoryDashboard from './components/InventoryDashboard';
-// import Marketplace from './components/Marketplace';
 import BackButton from './components/BackButton';
 
 const App: React.FC = () => {
@@ -22,16 +19,14 @@ const App: React.FC = () => {
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/producers" element={<AddProducer />} />
+          <Route path="/suppliers" element={<AddSupplier />} />
           <Route path="/products" element={<Products />} />
           <Route path="/customers" element={<CustomerList />} />
           <Route path="/orders" element={<OrderList />} />
           <Route path="/sales" element={<SaleList />} />
-          <Route path="/stocks" element={<Stocks />} />
           <Route path="/stats" element={<StatsDashboard />} />
-          <Route path="/marketplace/:productId" element={<ProductInstanceView />} />
           <Route path='/inventory-dashboard' element={<InventoryDashboard/>} />
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </div>
     </Router>
@@ -41,14 +36,12 @@ const App: React.FC = () => {
 const ConditionalBackButton: React.FC = () => {
   const location = useLocation();
   const routesWithBackButton = [
-    '/producers',
+    '/suppliers',
     '/products',
     '/customers',
     '/orders',
     '/sales',
-    '/stocks',
     '/stats',
-    '/marketplace',
     '/inventory-dashboard'
   ];
 

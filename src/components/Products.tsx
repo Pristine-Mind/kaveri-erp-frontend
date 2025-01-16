@@ -21,12 +21,14 @@ interface Product {
   reorder_level: number;
   is_active: boolean;
   category: string;
-  producer: string;
+  supplier: string;
+  sub_category: string;
   images: ProductImage[];
   category_details: string;
+  supplier_details: Supplier[];
 }
 
-interface Producer {
+interface Supplier {
   id: number;
   name: string;
 }
@@ -37,7 +39,7 @@ interface Category {
 }
 
 interface ErrorMessages {
-  producer?: string[];
+  supplier?: string[];
   name?: string[];
   description?: string[];
   sku?: string[];
@@ -46,6 +48,7 @@ interface ErrorMessages {
   stock?: string[];
   reorder_level?: string[];
   category?: string[];
+  sub_category?: string[];
   general?: string[];
 }
 
@@ -53,14 +56,14 @@ const Products: React.FC = () => {
   const { t } = useTranslation();
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [producers, setProducers] = useState<Producer[]>([]);
+  const [suppliers, setProducers] = useState<Supplier[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [maincategories, setmainCategories] = useState<Category[]>([]);
   const [formVisible, setFormVisible] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [viewingProductId, setViewingProductId] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
-    producer: '',
+    supplier: '',
     name: '',
     description: '',
     sku: '',
@@ -70,6 +73,7 @@ const Products: React.FC = () => {
     reorder_level: '10',
     is_active: true,
     category: '',
+    sub_category: '',
   });
   const [images, setImages] = useState<FileList | null>(null);
   const [existingImages, setExistingImages] = useState<ProductImage[]>([]);
@@ -130,7 +134,7 @@ const Products: React.FC = () => {
   const fetchProducers = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_REACT_APP_API_URL}/api/v1/producers/`,
+        `${import.meta.env.VITE_REACT_APP_API_URL}/api/v1/suppliers/`,
         {
           headers: { Authorization: `Token ${localStorage.getItem('token')}` },
         },
@@ -184,7 +188,7 @@ const Products: React.FC = () => {
     e.preventDefault();
 
     const formDataToSend = new FormData();
-    formDataToSend.append('producer', formData.producer);
+    formDataToSend.append('supplier', formData.supplier);
     formDataToSend.append('name', formData.name);
     formDataToSend.append('description', formData.description);
     formDataToSend.append('sku', formData.sku);
@@ -194,6 +198,7 @@ const Products: React.FC = () => {
     formDataToSend.append('reorder_level', formData.reorder_level);
     formDataToSend.append('is_active', String(formData.is_active));
     formDataToSend.append('category', formData.category);
+    formDataToSend.append('sub_category', formData.sub_category);
 
     if (images) {
       for (let i = 0; i < images.length; i++) {
@@ -247,7 +252,7 @@ const Products: React.FC = () => {
   const handleEdit = (product: Product) => {
     setEditingProductId(product.id);
     setFormData({
-      producer: product.producer?.toString() || '',
+      supplier: product.supplier?.toString() || '',
       name: product.name,
       description: product.description,
       sku: product.sku,
@@ -257,6 +262,7 @@ const Products: React.FC = () => {
       reorder_level: product.reorder_level.toString(),
       is_active: product.is_active,
       category: product.category,
+      sub_category: product.sub_category,
     });
     setExistingImages(product.images);
     setDeletedImages([]);
@@ -269,7 +275,7 @@ const Products: React.FC = () => {
 
   const resetForm = () => {
     setFormData({
-      producer: '',
+      supplier: '',
       name: '',
       description: '',
       sku: '',
@@ -279,6 +285,7 @@ const Products: React.FC = () => {
       reorder_level: '10',
       is_active: true,
       category: '',
+      sub_category: '',
     });
     setImages(null);
     setProducerSearchTerm('');
@@ -393,7 +400,7 @@ const Products: React.FC = () => {
               <div className="px-6 py-5 sm:p-8">
                 <div className="space-y-4">
                   <p>
-                    <strong>{t('producer')}:</strong> {viewingProductId.producer}
+                    <strong>{t('supplier')}:</strong> {viewingProductId.supplier_details.name}
                   </p>
                   <p>
                     <strong>{t('category')}:</strong> {viewingProductId.category_details}
@@ -493,50 +500,50 @@ const Products: React.FC = () => {
                   {success && <p className="text-green-500 mb-4">{success}</p>}
 
                   <div className="mb-4 relative" ref={producerSearchRef}>
-                    <label htmlFor="producer" className="block text-gray-700">
+                    <label htmlFor="supplier" className="block text-gray-700">
                       {t('supplier')} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
-                      id="producer"
-                      name="producer"
+                      id="supplier"
+                      name="supplier"
                       value={producerSearchTerm}
                       onChange={(e) => {
                         setProducerSearchTerm(e.target.value);
                         setShowProducerList(true);
                       }}
                       onFocus={() => setShowProducerList(true)}
-                      className={`w-full px-4 py-2 border rounded-lg ${errorMessages.producer ? 'border-red-500' : ''
+                      className={`w-full px-4 py-2 border rounded-lg ${errorMessages.supplier ? 'border-red-500' : ''
                         }`}
                       placeholder={t('search_supplier')}
                       required
                     />
                     {showProducerList && (
                       <ul className="absolute z-10 bg-white border rounded-lg w-full max-h-48 overflow-y-auto mt-1">
-                        {producers
+                        {suppliers
                           .filter((producer) =>
                             producer.name
                               .toLowerCase()
                               .includes(producerSearchTerm.toLowerCase())
                           )
-                          .map((producer) => (
+                          .map((supplier) => (
                             <li
-                              key={producer.id}
+                              key={supplier.id}
                               onClick={() => {
                                 setFormData({
                                   ...formData,
-                                  producer: producer.id.toString(),
+                                  supplier: supplier.id.toString(),
                                 });
-                                setProducerSearchTerm(producer.name);
+                                setProducerSearchTerm(supplier.name);
                                 setShowProducerList(false);
                               }}
                               className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
                             >
-                              {producer.name}
+                              {supplier.name}
                             </li>
                           ))}
-                        {producers.filter((producer) =>
-                          producer.name
+                        {suppliers.filter((supplier) =>
+                          supplier.name
                             .toLowerCase()
                             .includes(producerSearchTerm.toLowerCase())
                         ).length === 0 && (
@@ -544,9 +551,9 @@ const Products: React.FC = () => {
                         )}
                     </ul>
                   )}
-                  {errorMessages.producer && (
+                  {errorMessages.supplier && (
                     <p className="text-red-500 text-sm">
-                      {errorMessages.producer[0]}
+                      {errorMessages.supplier[0]}
                     </p>
                   )}
                 </div>
@@ -581,17 +588,17 @@ const Products: React.FC = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label htmlFor="category" className="block text-gray-700">
+                  <label htmlFor="sub_category" className="block text-gray-700">
                     {t('sub_category')} <span className="text-red-500">*</span>
                   </label>
                   <select
-                    id="category"
-                    name="category"
-                    value={formData.category}
+                    id="sub_category"
+                    name="sub_category"
+                    value={formData.sub_category}
                     onChange={(e) =>
-                      setFormData({ ...formData, category: e.target.value })
+                      setFormData({ ...formData, sub_category: e.target.value })
                     }
-                    className={`w-full px-4 py-2 border rounded-lg ${errorMessages.category ? 'border-red-500' : ''
+                    className={`w-full px-4 py-2 border rounded-lg ${errorMessages.sub_category ? 'border-red-500' : ''
                       }`}
                     required
                   >
@@ -602,9 +609,9 @@ const Products: React.FC = () => {
                       </option>
                     ))}
                   </select>
-                  {errorMessages.category && (
+                  {errorMessages.sub_category && (
                     <p className="text-red-500 text-sm">
-                      {errorMessages.category[0]}
+                      {errorMessages.sub_category[0]}
                     </p>
                   )}
                 </div>

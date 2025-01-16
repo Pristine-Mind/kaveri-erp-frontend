@@ -573,8 +573,12 @@ const CustomerList: React.FC = () => {
                   required
                 >
                   <option value="Retailer">{t('retailer')}</option>
-                  <option value="Wholesaler">{t('wholesaler')}</option>
                   <option value="Distributor">{t('distributor')}</option>
+                  <option value="Bar">Bar</option>
+                  <option value="Restaurant">Restaurant</option>
+                  <option value="Event">Event</option>
+                  <option value="Convinience Store">Convinience Store</option>
+                  <option value="Liquor Store">Liquor Store</option>
                 </select>
                 {errorMessages.customer_type && (
                   <p className="text-red-500 text-sm">{errorMessages.customer_type[0]}</p>

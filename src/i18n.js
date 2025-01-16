@@ -277,6 +277,7 @@ i18n.use(LanguageDetector).use(initReactI18next).init({
         add_product: "Add Product",
         supplier_name: "Supplier Name",
         edit_supplier: "Edit Supplier",
+        product_images: "Product Images",
       }
         
     },
